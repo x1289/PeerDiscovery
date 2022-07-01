@@ -1,6 +1,7 @@
 {
   "name": "peerdiscovery",
   "version": "1.0.0",
+  "type": "module",
   "description": "Networking component for peer discovery for a bitcoin node",
   "main": "index.js",
   "scripts": {

@@ -1,6 +1,6 @@
-const net = require('net');
-const { Buffer } = require('buffer');
-const crypto = require('crypto');
+import net from 'net';
+import { Buffer } from 'buffer';
+import crypto from 'crypto';
 
 const addr = '51.68.36.57'
 const port = 8333;
