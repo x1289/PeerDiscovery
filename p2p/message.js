@@ -1,91 +1,91 @@
 import { Buffer } from 'buffer';
+import { MessageHeader } from './messageHeader.js';
 import * as CONSTANTS from './constants.js';
+import * as payloads from './payloads/payloads.js';
 
-const HEADER_LENGTH = 24;
-
-const START_STRING_OFFSET = 0;
-const START_STRING_LENGTH = 4;
-
-const COMMAND_NAME_OFFSET = 4;
-const COMMAND_NAME_LENGTH = 12;
-
-const PAYLOAD_SIZE_OFFSET = 16;
-const PAYLOAD_SIZE_LENGTH = 4;
-
-const CHECKSUM_OFFSET = 20;
-const CHECKSUM_LENGTH = 4;
-
-
-export class MessageHeader {
-  constructor(startString, commandName, payloadSize, checksum) {
-    if (startString === CONSTANTS.MAINNET_START_STRING ||
-      startString === CONSTANTS.TESTNET_START_STRING ||
-      startString === CONSTANTS.REGTEST_START_STRING) {
-        this.startString = startString;
-    } else {
-      this.valid = false;
-    }
-
-    if (!CONSTANTS.COMMAND_NAMES.includes(commandName)) {
-      this.valid = false;
-    } else {
-      this.commandName = commandName;
-    }
-
-    if (payloadSize !== null) {
-      this.payloadSize = payloadSize;
-    } else if (payload === null) {
-      this.payloadSize = 0;
-    } else {
-      this.valid = false;
-    }
-
-    this.checksum = checksum;
+export class Message {
+  constructor(header = null, payload = null) {
+    this.header = header;
+    this.payload = payload;
   }
 
   serialize() {
-    if (this.valid === false) return null;
-
-    const startStringBuffer = Buffer.from(CONSTANTS.START_STRINGS[this.startString]);
-
-    const commandNameBuffer = Buffer.alloc(12);
-    Buffer.from(this.commandName).copy(commandNameBuffer);
-    
-    const payloadSizeBuffer = Buffer.alloc(4);
-    let checkSumBuffer;
-    if (this.payloadSize !== null) {
-      payloadSizeBuffer.writeUInt32LE(this.payloadSize, 0);
-      checkSumBuffer = this.checksum;
-    } else {
-      checkSumBuffer = Buffer.from(CONSTANTS.EMPTY_STRING_CHECKSUM_HEX);
-    }
-
-    const data = [startStringBuffer, commandNameBuffer, payloadSizeBuffer, checkSumBuffer];
-    const dataLength = data.reduce((res, el) => res += el.length, 0);
-    return Buffer.concat(data, dataLength);
+    if (!this.header || !this.payload) return null;
+    const serializedHeader = this.header.serialize();
+    const serializedPayload = this.payload.serialize();
+    return Buffer.concat([serializedHeader, serializedPayload], serializedHeader.length + serializedPayload.length);
   }
 
   static deserialize(msg) {
-    if (!Buffer.isBuffer(msg) || msg.length !== HEADER_LENGTH) return null;
+    if (!msg || !Buffer.isBuffer(msg) || msg.length < MessageHeader.HEADER_SIZE) return null;
+    const header = MessageHeader.deserialize(msg.subarray(0, MessageHeader.HEADER_SIZE));
+    let payload = null;
+    if (msg.length > MessageHeader.HEADER_SIZE && header?.commandName) payload = Message.deserializePayload(header.commandName, msg.subarray(MessageHeader.HEADER_SIZE, msg.length));
+    return new Message(header, payload);
+  }
 
-    const startStringBuffer = msg.subarray(START_STRING_OFFSET, START_STRING_OFFSET + START_STRING_LENGTH);
-    let startString;
-    if (Buffer.compare(startStringBuffer, Buffer.from(CONSTANTS.MAINNET_START_STRING_HEX)) === 0) {
-      startString = CONSTANTS.MAINNET_START_STRING;
-    } else if (Buffer.compare(startStringBuffer, Buffer.from(CONSTANTS.TESTNET_START_STRING_HEX)) === 0) {
-      startString = CONSTANTS.TESTNET_START_STRING;
-    } else if (Buffer.compare(startStringBuffer, Buffer.from(CONSTANTS.REGTEST_START_STRING_HEX)) === 0) {
-      startString = CONSTANTS.REGTEST_START_STRING;
-    } else {
-      return null;
+  static deserializePayload(commandName, payload) {
+    switch (commandName) {
+        case CONSTANTS.COMMAND_NAME_GET_HEADERS:
+          break;
+        case CONSTANTS.COMMAND_NAME_GET_BLOCKS:
+          break;
+        case CONSTANTS.COMMAND_NAME_MEMPOOL:
+          break;
+        
+        case CONSTANTS.COMMAND_INV:
+          return payloads.Inv.deserialize(payload);
+        case CONSTANTS.COMMAND_GET_DATA:
+          break;
+        
+        case CONSTANTS.COMMAND_NAME_HEADERS:
+          break;
+        case CONSTANTS.COMMAND_NAME_TX:
+          break;
+        case CONSTANTS.COMMAND_NAME_BLOCK:
+          break;
+        case CONSTANTS.COMMAND_NAME_MERKLE_BLOCK:
+          break;
+        case CONSTANTS.COMMAND_NAME_NOT_FOUND:
+          break;
+
+        case CONSTANTS.COMMAND_NAME_VERSION:
+          return payloads.Version.deserialize(payload);
+        case CONSTANTS.COMMAND_NAME_VERACK:
+          break;
+          
+        case CONSTANTS.COMMAND_NAME_PING:
+          break;
+        case CONSTANTS.COMMAND_NAME_PONG:
+          break;
+          
+        case CONSTANTS.COMMAND_NAME_GET_ADDR:
+          break;
+        case CONSTANTS.COMMAND_NAME_ADDR:
+          break;
+        case CONSTANTS.COMMAND_NAME_ADDR_V2:
+          break;
+          
+        case CONSTANTS.COMMAND_NAME_FILTER_LOAD:
+          break;
+        case CONSTANTS.COMMAND_NAME_FILTER_ADD:
+          break;
+        case CONSTANTS.COMMAND_NAME_FILTER_CLEAR:
+          break;
+          
+        case CONSTANTS.COMMAND_NAME_ALERT:
+          break;
+          
+        case CONSTANTS.COMMAND_NAME_SEND_ADDR_V2:
+          break;
+          
+        case CONSTANTS.COMMAND_NAME_SEND_HEADERS:
+          break;
+          
+        case CONSTANTS.COMMAND_NAME_REJECT:
+          break;
+        default:
+          return null;
     }
-    
-    const commandNameTemp = msg.subarray(COMMAND_NAME_OFFSET, COMMAND_NAME_OFFSET + COMMAND_NAME_LENGTH).toString();
-    const commandName = commandNameTemp.slice(0, commandNameTemp.indexOf('\x00'));
-
-    const payloadSize = msg.readUInt32LE(PAYLOAD_SIZE_OFFSET);
-    const checkSum = msg.subarray(CHECKSUM_OFFSET, CHECKSUM_OFFSET + CHECKSUM_LENGTH);
-    
-    return new MessageHeader(startString, commandName, payloadSize, checkSum);
   }
 }

@@ -7,6 +7,11 @@ export function checksum(msg) {
   return hashBuffer.subarray(0, CONSTANTS.CHECKSUM_BYTE_COUNT);
 }
 
+export function doubleSHA(msg, len) {
+  const hashBuffer = hashMessage(msg);
+  return hashBuffer.subarray(0, len);
+}
+
 export function hashMessage(msg, encoding = undefined) {
   let checkSumHash1 = crypto.createHash('sha256').update(msg).digest();
   let checkSumHash = crypto.createHash('sha256').update(checkSumHash1).digest(encoding);

@@ -1,5 +1,5 @@
 import { Buffer } from 'buffer';
-import * as CONSTANTS from './constants.js';
+import * as CONSTANTS from './constants.js.js';
 
 const VERSION_OFFSET = 0;
 const VERSION_LENGTH = 4;
