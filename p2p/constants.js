@@ -24,6 +24,18 @@ export const REGTEST_MAX_N_BITS = 0x207fffff;
 export const EMPTY_STRING_CHECKSUM_HEX = [0x5d, 0xf6, 0xe0, 0xe2];
 
 export const CHECKSUM_BYTE_COUNT = 4;
+
+export const MAX_SIZE = 0x02000000;
+
+export const COMPACT_SIZE_UINT_16_IDENTIFIER = 0xfd;
+export const COMPACT_SIZE_UINT_16_BYTES = 2;
+
+export const COMPACT_SIZE_UINT_32_IDENTIFIER = 0xfe;
+export const COMPACT_SIZE_UINT_32_BYTES = 4;
+
+export const COMPACT_SIZE_UINT_64_IDENTIFIER = 0xff;
+export const COMPACT_SIZE_UINT_64_BYTES = 8;
+
 //#endregion
 
 //#region Messages
