@@ -9,10 +9,14 @@ export class Message {
     this.payload = payload;
   }
 
+  size() {
+    return MessageHeader.HEADER_SIZE + (this.payload === null ? 0 : this.payload.serializedSize);
+  }
+
   serialize() {
-    if (!this.header || !this.payload) return null;
+    if (!this.header) return null;
     const serializedHeader = this.header.serialize();
-    const serializedPayload = this.payload.serialize();
+    const serializedPayload = this.payload === null ? Buffer.alloc(0) : this.payload.serialize();
     return Buffer.concat([serializedHeader, serializedPayload], serializedHeader.length + serializedPayload.length);
   }
 
@@ -27,9 +31,9 @@ export class Message {
   static deserializePayload(commandName, payload) {
     switch (commandName) {
         case CONSTANTS.COMMAND_NAME_GET_HEADERS:
-          break;
+          return payloads.GetHeaders.deserialize(payload);
         case CONSTANTS.COMMAND_NAME_GET_BLOCKS:
-          break;
+          return payloads.GetBlocks.deserialize(payload);
         case CONSTANTS.COMMAND_NAME_MEMPOOL:
           break;
         
@@ -52,37 +56,30 @@ export class Message {
         case CONSTANTS.COMMAND_NAME_VERSION:
           return payloads.Version.deserialize(payload);
         case CONSTANTS.COMMAND_NAME_VERACK:
-          break;
-          
+          return payloads.VerAck.deserialize(payload);
         case CONSTANTS.COMMAND_NAME_PING:
-          break;
+          return payloads.Ping.deserialize(payload);
         case CONSTANTS.COMMAND_NAME_PONG:
-          break;
-          
+          return payloads.Pong.deserialize(payload);
         case CONSTANTS.COMMAND_NAME_GET_ADDR:
-          break;
+          return payloads.GetAddr.deserialize(payload);
         case CONSTANTS.COMMAND_NAME_ADDR:
-          break;
+          return payloads.Addr.deserialize(payload);
         case CONSTANTS.COMMAND_NAME_ADDR_V2:
-          break;
-          
+          return payloads.AddrV2.deserialize(payload);
         case CONSTANTS.COMMAND_NAME_FILTER_LOAD:
-          break;
+          return payloads.FilterLoad.deserialize(payload);
         case CONSTANTS.COMMAND_NAME_FILTER_ADD:
-          break;
+          return payloads.FilterAdd.deserialize(payload);
         case CONSTANTS.COMMAND_NAME_FILTER_CLEAR:
+          return payloads.FilterClear.deserialize(payload);
+        case CONSTANTS.COMMAND_NAME_ALERT: // DEPRECATED
           break;
-          
-        case CONSTANTS.COMMAND_NAME_ALERT:
-          break;
-          
         case CONSTANTS.COMMAND_NAME_SEND_ADDR_V2:
-          break;
-          
+          return payloads.SendAddrV2.deserialize(payload);
         case CONSTANTS.COMMAND_NAME_SEND_HEADERS:
-          break;
-          
-        case CONSTANTS.COMMAND_NAME_REJECT:
+          return payloads.SendHeaders.deserialize(payload);
+        case CONSTANTS.COMMAND_NAME_REJECT: // DEPRECATED
           break;
         default:
           return null;

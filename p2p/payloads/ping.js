@@ -6,6 +6,7 @@ const NONCE_OFFSET = 0;
 export class Ping {
   constructor(nonce) {
     this.nonce = nonce;
+    this.serializedSize = NONCE_LENGTH;
   }
 
   serialize() {

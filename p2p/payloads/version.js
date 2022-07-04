@@ -43,7 +43,7 @@ const VERSION_MIN_LENGTH = 86;
 //#endregion
 
 export class Version {
-  constructor(version, services, timestamp, addrRecvServices, addrRecvIp, addrRecvPort,
+  constructor(serializedSize, version, services, timestamp, addrRecvServices, addrRecvIp, addrRecvPort,
     addrTransServices, addrTransIp, addrTransPort, nonce, userAgentBytes, userAgent, startHeight, relay) {
       if (userAgentBytes !== 0x00 && userAgent && userAgentBytes !== userAgent.length) return null;
       this.version = version;
@@ -60,6 +60,11 @@ export class Version {
       this.userAgent = userAgent;
       this.startHeight = startHeight;
       this.relay = relay;
+      if (serializedSize === null) {
+        this.serializedSize = this.serialize().length;
+      } else {
+        this.serializedSize = serializedSize;
+      }
   }
 
   serialize() {
@@ -110,12 +115,15 @@ export class Version {
     const addrTransPort = msg.readUint16BE(ADDR_TRANS_PORT_OFFSET);
     const nonce = msg.readBigUInt64LE(NONCE_OFFSET);
     const userAgentBytes = helper.readCompactSizeValue(msg, USER_AGENT_BYTES_OFFSET);
+    const userAgentBytesBytes = helper.getCompactSizeBytes(userAgentBytes);
     const userAgentStart = USER_AGENT_BYTES_OFFSET + helper.getCompactSizeBytes(userAgentBytes);
     const userAgent = msg.subarray(userAgentStart, userAgentStart + userAgentBytes).toString();
     const startHeight = msg.readInt32LE(userAgentStart + userAgentBytes, START_HEIGHT_LENGTH);
     const relay = Boolean(msg.readInt8(userAgentStart + userAgentBytes + START_HEIGHT_LENGTH));
 
-    return new Version(version, services, timestamp, addrRecvServices, addrRecvIp, addrRecvPort,
+    const serializedSize = VERSION_LENGTH + SERVICES_LENGTH + TIMESTAMP_LENGTH + ADDR_RECV_SERVICES_LENGTH + ADDR_RECV_IP_LENGTH + ADDR_RECV_PORT_LENGTH +
+      ADDR_TRANS_SERVICES_LENGTH + ADDR_TRANS_IP_LENGTH + ADDR_TRANS_PORT_LENGTH + NONCE_LENGTH + userAgentBytesBytes + userAgentBytes + START_HEIGHT_LENGTH + RELAY_LENGTH;
+    return new Version(serializedSize, version, services, timestamp, addrRecvServices, addrRecvIp, addrRecvPort,
       addrTransServices, addrTransIp, addrTransPort, nonce, userAgentBytes, userAgent, startHeight, relay);
   }
 }

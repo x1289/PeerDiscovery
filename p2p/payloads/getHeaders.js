@@ -1,5 +1,6 @@
 import { Buffer } from 'buffer';
 import * as CONSTANTS from '../constants.js';
+import * as helper from '../helper.js';
 
 const VERSION_OFFSET = 0;
 const VERSION_LENGTH = 4;
@@ -9,7 +10,7 @@ const BLOCK_HEADER_HASH_LENGTH = 32;
 
 const STOP_HASH_LENGTH = 32;
 
-export class GetBlocks {
+export class GetHeaders {
   constructor(serializedSize = null, version, hashCount, blockHeaderHashes, stopHash) {
     this.version = version;
     this.hashCount = hashCount;
@@ -45,7 +46,7 @@ export class GetBlocks {
     if (msg.length !== (VERSION_LENGTH + hashCountBytes + hashCount * BLOCK_HEADER_HASH_LENGTH + STOP_HASH_LENGTH)) return null;
 
     const blockHeaderHashes = [];
-    for (let i = 0; i < hashCount; i++) {
+    for (let i = 0; i < count; i++) {
       const blockHeaderHashStart = BLOCK_HEADER_HASH_OFFSET + i * BLOCK_HEADER_HASH_LENGTH;
       blockHeaderHashes.push(msg.subarray(blockHeaderHashStart, blockHeaderHashStart + BLOCK_HEADER_HASH_LENGTH).toString('hex'));
     }
@@ -54,6 +55,6 @@ export class GetBlocks {
     const stopHash = msg.subarray(stopHashOffset, stopHashOffset + STOP_HASH_LENGTH).toString('hex');
 
     const serializedSize = VERSION_LENGTH + hashCountBytes + hashCount * BLOCK_HEADER_HASH_LENGTH + STOP_HASH_LENGTH;
-    return new GetBlocks(serializedSize, version, hashCount, blockHeaderHashes, stopHash);
+    return new GetHeaders(serializedSize, version, hashCount, blockHeaderHashes, stopHash);
   }
 }

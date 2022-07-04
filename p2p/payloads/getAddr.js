@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer';
 
-export class VerAck {
+export class GetAddr {
   constructor() {
     this.serializedSize = 0;
   }
@@ -10,6 +10,6 @@ export class VerAck {
   }
 
   static deserialize() {
-    return new VerAck();
+    return new GetAddr();
   }
 }

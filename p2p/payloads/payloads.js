@@ -1,7 +1,7 @@
 
 //#region Data Messages
-// 'getheaders'
-// 'getblocks'
+import { GetHeaders } from './getHeaders.js';
+import { GetBlocks } from './getBlocks.js';
 // 'mempool'
 
 import { Inv } from './inv.js';
@@ -11,7 +11,7 @@ import { Inv } from './inv.js';
 // 'tx'
 // 'block'
 // 'merkleblock'
-// 'sendcmpct'
+import { SendCmpct } from './sendCmpct.js';
 
 // 'getblocktxn'
 // 'blocktxn'
@@ -22,8 +22,6 @@ import { Inv } from './inv.js';
 
 //#endregion
 
-
-
 //#region Control Messages
 import { Version } from './version.js';
 import { VerAck } from './verack.js';
@@ -31,24 +29,25 @@ import { VerAck } from './verack.js';
 import { Ping } from './ping.js';
 import { Pong } from './pong.js';
 
-// 'getaddr'
-// 'addr'
-// 'addrv2'
+import { GetAddr } from './getAddr.js';
 
-// 'filterload'
-// 'filteradd'
-// 'filterclear'
+import { Addr } from './addr.js';
+import { AddrV2 } from './addrV2.js';
 
-// 'alert'
+import { FilterLoad } from './filterLoad.js';
+import { FilterAdd } from './filterAdd.js';
+import { FilterClear } from './filterClear.js';
 
-// 'sendaddrv2'
+// DEPRECATED: 'alert'
 
-// 'feefilter'
+import { SendAddrV2 } from './sendAddrv2.js';
 
-// 'sendheaders'
+import { FeeFilter } from './feeFilter.js';
 
-// 'reject'
+import { SendHeaders } from './sendHeaders.js';
+
+// DEPRECATED: 'reject'
 
 //#endregion
 
-export { Inv, Version, VerAck, Ping, Pong };
+export { GetHeaders, GetBlocks, Inv, SendCmpct, Version, VerAck, Ping, Pong, Addr, AddrV2, GetAddr, FilterLoad, FilterAdd, FilterClear, SendAddrV2, FeeFilter, SendHeaders };
