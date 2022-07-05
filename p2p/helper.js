@@ -21,12 +21,12 @@ export function hashMessage(msg, encoding = undefined) {
 export function readCompactSizeValue(buf, offset) {
   if (!Buffer.isBuffer(buf) || buf.length < offset) return null;
 
-  const identifier = buf.readUint8(offset);
+  const identifier = buf.readUInt8(offset);
   if (identifier < CONSTANTS.COMPACT_SIZE_UINT_16_IDENTIFIER) {
     return identifier;
   } else if (identifier === CONSTANTS.COMPACT_SIZE_UINT_16_IDENTIFIER) {
     if (buf.length < offset + CONSTANTS.COMPACT_SIZE_UINT_16_BYTES) return null;
-    return buf.readUint16LE(offset + 1);
+    return buf.readUInt16LE(offset + 1);
   } else if (identifier === CONSTANTS.COMPACT_SIZE_UINT_32_IDENTIFIER) {
     if (buf.length < offset + CONSTANTS.COMPACT_SIZE_UINT_32_BYTES) return null;
     return buf.readUInt32LE(offset + 1);

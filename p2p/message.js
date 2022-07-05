@@ -30,18 +30,18 @@ export class Message {
 
   static deserializePayload(commandName, payload) {
     switch (commandName) {
+        case CONSTANTS.COMMAND_NAME_FEE_FILTER:
+          return payloads.FeeFilter.deserialize(payload);
         case CONSTANTS.COMMAND_NAME_GET_HEADERS:
           return payloads.GetHeaders.deserialize(payload);
         case CONSTANTS.COMMAND_NAME_GET_BLOCKS:
           return payloads.GetBlocks.deserialize(payload);
         case CONSTANTS.COMMAND_NAME_MEMPOOL:
           break;
-        
         case CONSTANTS.COMMAND_INV:
           return payloads.Inv.deserialize(payload);
         case CONSTANTS.COMMAND_GET_DATA:
           break;
-        
         case CONSTANTS.COMMAND_NAME_HEADERS:
           break;
         case CONSTANTS.COMMAND_NAME_TX:
@@ -52,7 +52,6 @@ export class Message {
           break;
         case CONSTANTS.COMMAND_NAME_NOT_FOUND:
           break;
-
         case CONSTANTS.COMMAND_NAME_VERSION:
           return payloads.Version.deserialize(payload);
         case CONSTANTS.COMMAND_NAME_VERACK:
@@ -80,6 +79,14 @@ export class Message {
         case CONSTANTS.COMMAND_NAME_SEND_HEADERS:
           return payloads.SendHeaders.deserialize(payload);
         case CONSTANTS.COMMAND_NAME_REJECT: // DEPRECATED
+          break;
+        case CONSTANTS.COMMAND_NAME_CMPCT_BLOCK:
+          break;
+        case CONSTANTS.COMMAND_NAME_SEND_CMPCT:
+          return payloads.SendCmpct.deserialize(payload);
+        case CONSTANTS.COMMAND_NAME_GET_BLOCK_TXN:
+          break;
+        case CONSTANTS.COMMAND_NAME_BLOCK_TXN:
           break;
         default:
           return null;

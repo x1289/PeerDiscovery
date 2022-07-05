@@ -28,8 +28,22 @@ class PeerDiscovery {
     const peer = this.peers[peerId]
     if (!peer) return null;
     peer.connect();
-    if (!peer) return false;
     this.startListeningToPeer(peer);
+  }
+
+  handleMessageFromPeer(peer, msg) {
+    if (!Buffer.isBuffer(msg) || msg.length < MessageHeader.HEADER_SIZE) return null;
+    while(msg.length > 0) {
+      const msgHeader = MessageHeader.deserialize(msg);
+      if (!msgHeader) break; // break on bad header.. maybe this could be recovered by searching for next startstring but TODO someday...
+      const payloadBuffer = Buffer.alloc(msgHeader.payloadSize);
+      if (msgHeader.payloadSize > 0) {
+        msg.copy(payloadBuffer, 0, MessageHeader.HEADER_SIZE, MessageHeader.HEADER_SIZE + msgHeader.payloadSize);
+      }
+      const payload = Message.deserializePayload(msgHeader.commandName, payloadBuffer);
+      msg = msg.subarray(MessageHeader.HEADER_SIZE + msgHeader.payloadSize);
+      this.handleMessage(peer, new Message(msgHeader, payload));
+    }
   }
 
   startListeningToPeer(peer) {
@@ -42,16 +56,7 @@ class PeerDiscovery {
     peer.on('message', ({id, data}) => {
       try {
         if (id !== peer.id) return;
-        let subData = data;
-        while (subData.length > 0) {
-          const msg = Message.deserialize(subData);
-          if (!msg || !msg.header) return;
-          
-          console.log(`Message from Peer ${id} msg:`, msg, msg.size(), subData.length, subData.length - msg.size());
-          this.handleMessage(peer, msg);
-          subData = subData.subarray(msg.size());
-        }
-        console.log('exit while');
+        this.handleMessageFromPeer(peer, data);
       } catch (error) {
         console.log('error', error);
       }
@@ -59,10 +64,10 @@ class PeerDiscovery {
   }
 
   handleMessage(peer, msg) {
+    console.log(`Handle message from peer '${peer.id}':`, msg)
     if (!peer || !msg || !msg.header || !msg.payload) return null;
-    console.log('handle Message', msg.header.commandName);
     if (msg.header.commandName === 'version' && peer.isConnecting()) {
-      peer.connectionState = 'connected'; // TODO: Refactor...
+      peer.connectionState = 'connected'; // TODO: Refactor: better way to set peer as connected...
       const verAckMessage = this.getVerAckMessage();
       peer.send(verAckMessage.serialize());
     } else if (msg.header.commandName === 'ping') {
@@ -72,7 +77,7 @@ class PeerDiscovery {
   }
 
   getPongMessage(nonce) {
-    const pongMessageHeader = new MessageHeader(this.network, CONSTANTS.COMMAND_NAME_PONG, 0, Buffer.from(CONSTANTS.EMPTY_STRING_CHECKSUM_HEX));
+    const pongMessageHeader = new MessageHeader(this.network, CONSTANTS.COMMAND_NAME_PONG, 8, Buffer.from(CONSTANTS.EMPTY_STRING_CHECKSUM_HEX));
     const pongMessagePayload = new payloads.Pong(nonce);
     return new Message(pongMessageHeader, pongMessagePayload);
   }

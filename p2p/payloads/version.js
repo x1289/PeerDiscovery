@@ -79,15 +79,15 @@ export class Version {
     const addrRecvIp = this.addrRecvIp;
 
     const addrRecvPort = Buffer.alloc(2);
-    addrRecvPort.writeUint16BE(this.addrRecvPort);
+    addrRecvPort.writeUInt16BE(this.addrRecvPort);
     const addrTransServices = Buffer.alloc(8);
 
     const addrTransIp = this.addrTransIp;
 
     const addrTransPort = Buffer.alloc(2);
-    addrTransPort.writeUint16BE(this.addrTransPort);
+    addrTransPort.writeUInt16BE(this.addrTransPort);
     const nonce = Buffer.alloc(8);
-    nonce.writeBigUint64LE(this.nonce);
+    nonce.writeBigUInt64LE(this.nonce);
 
     const userAgentBytes = helper.toCompactSizeBuffer(this.userAgentBytes); // = Buffer.alloc(helper.getCompactSizeBytes(this.userAgentBytes));
     const userAgent = Buffer.from(this.userAgent);
@@ -102,17 +102,16 @@ export class Version {
   }
 
   static deserialize(msg) {
-    if (!Buffer.isBuffer(msg) || msg.length < VERSION_MIN_LENGTH) return null;
-
-    const version = msg.readUint32LE(VERSION_OFFSET);
+    if (!Buffer.isBuffer(msg)) return null;
+    const version = msg.readUInt32LE(VERSION_OFFSET);
     const services = msg.readBigUInt64LE(SERVICES_OFFSET);
     const timestamp = msg.readBigInt64LE(TIMESTAMP_OFFSET);
-    const addrRecvServices = msg.readBigUInt64LE(ADDR_RECV_SERVICES_OFFSET);;
+    const addrRecvServices = msg.readBigUInt64LE(ADDR_RECV_SERVICES_OFFSET);
     const addrRecvIp = msg.subarray(ADDR_RECV_IP_OFFSET, ADDR_RECV_IP_OFFSET + ADDR_RECV_IP_LENGTH);
-    const addrRecvPort = msg.readUint16BE(ADDR_RECV_PORT_OFFSET);
+    const addrRecvPort = msg.readUInt16BE(ADDR_RECV_PORT_OFFSET);
     const addrTransServices = msg.readBigUInt64LE(ADDR_TRANS_SERVICES_OFFSET);
     const addrTransIp = msg.subarray(ADDR_TRANS_IP_OFFSET, ADDR_TRANS_IP_OFFSET + ADDR_TRANS_IP_LENGTH);
-    const addrTransPort = msg.readUint16BE(ADDR_TRANS_PORT_OFFSET);
+    const addrTransPort = msg.readUInt16BE(ADDR_TRANS_PORT_OFFSET);
     const nonce = msg.readBigUInt64LE(NONCE_OFFSET);
     const userAgentBytes = helper.readCompactSizeValue(msg, USER_AGENT_BYTES_OFFSET);
     const userAgentBytesBytes = helper.getCompactSizeBytes(userAgentBytes);

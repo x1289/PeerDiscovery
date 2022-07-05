@@ -27,21 +27,21 @@ export class Address {
     const timeBuffer = Buffer.alloc(TIME_LENGTH);
     timeBuffer.writeUInt32LE(this.time);
     const servicesBuffer = Buffer.alloc(SERVICES_LENGTH);
-    servicesBuffer.writeBigUint64LE(this.services);
+    servicesBuffer.writeBigUInt64LE(this.services);
     const ipBuffer = Buffer.alloc(IP_LENGTH);
     const ipStringBuffer = Buffer.from(this.ip, 'hex');
     ipStringBuffer.copy(ipBuffer, IP_LENGTH - ipStringBuffer.length);
     const portBuffer = Buffer.alloc(PORT_LENGTH);
-    portBuffer.writeUint16BE(this.port);
+    portBuffer.writeUInt16BE(this.port);
     return Buffer.concat([timeBuffer, servicesBuffer, ipBuffer, portBuffer], timeBuffer.length + servicesBuffer.length + ipBuffer.length + portBuffer.length);
   }
 
   static deserialize(msg) {
     if (!Buffer.isBuffer(msg) || msg.length !== Address.ADDRESS_LENGTH) return null;
-    const time = msg.readUint32LE(TIME_OFFSET);
-    const services = msg.readBigUint64LE(SERVICES_OFFSET);
+    const time = msg.readUInt32LE(TIME_OFFSET);
+    const services = msg.readBigUInt64LE(SERVICES_OFFSET);
     const ip = msg.subarray(IP_OFFSET, IP_OFFSET + IP_LENGTH).toString('hex');
-    const port = msg.readUint16BE(PORT_OFFSET);
+    const port = msg.readUInt16BE(PORT_OFFSET);
     return new Address(time, services, ip, port)
   }
 }

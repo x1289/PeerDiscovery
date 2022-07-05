@@ -40,19 +40,19 @@ export class AddressV2 {
   serialize() {
     if (!this.services || !this.ip || !this.port) return null;
     const timeBuffer = Buffer.alloc(TIME_LENGTH);
-    timeBuffer.writeUint32LE(this.time);
+    timeBuffer.writeUInt32LE(this.time);
 
     const servicesBuffer = helper.toCompactSizeBuffer(this.services);
 
     const networkIdBuffer = Buffer.alloc(NETWORK_ID_LENGTH);
-    networkIdBuffer.writeUint8(this.networkId);
+    networkIdBuffer.writeUInt8(this.networkId);
 
     const addressLengthBuffer = helper.toCompactSizeBuffer(this.addressLength);
 
     const addressBuffer = Buffer.from(this.address); // TODO: parse this to IP
     
     const portBuffer = Buffer.alloc(PORT_LENGTH);
-    portBuffer.writeUint16(this.port);
+    portBuffer.writeUInt16BE(this.port);
 
     const dataLength = timeBuffer.length + servicesBuffer.length + networkIdBuffer.length + addressLengthBuffer.length + addressBuffer.length + portBuffer.length;
     return Buffer.concat([timeBuffer, servicesBuffer, networkIdBuffer, addressLengthBuffer, addressBuffer, portBuffer], dataLength);
@@ -60,12 +60,12 @@ export class AddressV2 {
 
   static deserialize(msg) {
     if (!Buffer.isBuffer(msg)) return null;
-    const time = msg.readUint32LE(TIME_OFFSET);
+    const time = msg.readUInt32LE(TIME_OFFSET);
     const services = helper.readCompactSizeValue(msg, SERVICES_OFFSET);
     const servicesBytes = helper.getCompactSizeBytes(services);
 
     const networkIdOffset = TIME_OFFSET + TIME_LENGTH + servicesBytes;
-    const networkId = msg.readUint8(networkIdOffset)
+    const networkId = msg.readUInt8(networkIdOffset)
     const addressLengthOffset = networkIdOffset + NETWORK_ID_LENGTH;
 
     const addressLength = helper.readCompactSizeValue(msg, addressLengthOffset);
@@ -75,7 +75,7 @@ export class AddressV2 {
     const address = Array.from(msg.subarray(addressOffset, addressOffset + addressLength)); // TODO: parse this from Buffer to IP
 
     const portOffset = addressOffset + addressLength;
-    const port = msg.readUint16BE(portOffset);
+    const port = msg.readUInt16BE(portOffset);
     const serializedSize = TIME_LENGTH + servicesBytes + NETWORK_ID_LENGTH + addressLengthBytes + addressLength + PORT_LENGTH;
     return new AddressV2(serializedSize, time, services, networkId, addressLength, address, port)
   }

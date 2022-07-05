@@ -4,6 +4,8 @@ import * as CONSTANTS from '../constants.js';
 const VERSION_OFFSET = 0;
 const VERSION_LENGTH = 4;
 
+const HASH_COUNT_OFFSET = 4;
+
 const BLOCK_HEADER_HASH_OFFSET = 4;
 const BLOCK_HEADER_HASH_LENGTH = 32;
 
@@ -24,7 +26,7 @@ export class GetBlocks {
 
   serialize() {
     const versionBuffer = Buffer.alloc(VERSION_LENGTH);
-    versionBuffer.writeUint32LE(this.version);
+    versionBuffer.writeUInt32LE(this.version);
     const hashCountBuffer = helper.toCompactSizeBuffer(this.hashCount);
     const blockHeaderHashesBuffer = this.blockHeaderHashes.map((blockHeaderHash) => {
       return Buffer.from(blockHeaderHash, 'hex');
@@ -36,13 +38,11 @@ export class GetBlocks {
   }
 
   static deserialize(msg) {
-    if (!Buffer.isBuffer(msg) || msg && msg.length > CONSTANTS.MAX_SIZE || msg.length < VERSION_LENGTH + STOP_HASH_LENGTH) return null;
+    if (!Buffer.isBuffer(msg)) return null;
 
     const version = msg.readUInt32LE(VERSION_OFFSET);
-    const hashCount = helper.toCompactSizeBuffer(this.hashCount);
+    const hashCount = helper.readCompactSizeValue(msg, HASH_COUNT_OFFSET);
     const hashCountBytes = helper.getCompactSizeBytes(hashCount);
-
-    if (msg.length !== (VERSION_LENGTH + hashCountBytes + hashCount * BLOCK_HEADER_HASH_LENGTH + STOP_HASH_LENGTH)) return null;
 
     const blockHeaderHashes = [];
     for (let i = 0; i < hashCount; i++) {

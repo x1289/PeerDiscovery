@@ -69,7 +69,7 @@ export class MessageHeader {
   }
 
   static deserialize(msg) {
-    if (!Buffer.isBuffer(msg) || msg.length !== HEADER_LENGTH) return null;
+    if (!Buffer.isBuffer(msg) || msg.length < HEADER_LENGTH) return null;
 
     const startStringBuffer = msg.subarray(START_STRING_OFFSET, START_STRING_OFFSET + START_STRING_LENGTH);
     let startString;

@@ -29,11 +29,11 @@ export class FilterLoad {
     const nFilterBytesBuffer = helper.toCompactSizeBuffer(this.nFilterBytes);
     const filterBuffer = Buffer.from(this.filter);
     const nHashFuncsBuffer = Buffer.alloc(N_HASH_FUNCS_LENGTH);
-    nHashFuncsBuffer.writeUint32LE(this.nHashFuncs)
+    nHashFuncsBuffer.writeUInt32LE(this.nHashFuncs)
     const nTweakBuffer = Buffer.alloc(N_TWEAK_LENGTH);
-    nTweakBuffer.writeUint32LE(this.nTweak);
+    nTweakBuffer.writeUInt32LE(this.nTweak);
     const nFlagsBuffer = Buffer.alloc(N_FLAGS_LENGTH);
-    nFlagsBuffer.writeUint8(this.nFlags);
+    nFlagsBuffer.writeUInt8(this.nFlags);
     const dataLength = nFilterBytesBuffer.length + filterBuffer.length + nHashFuncsBuffer.length + nTweakBuffer.length + nFlagsBuffer.length;
     return Buffer.concat([nFilterBytesBuffer, filterBuffer, nHashFuncsBuffer, nTweakBuffer, nFlagsBuffer], dataLength);
   }

@@ -15,12 +15,12 @@ export class FeeFilter {
 
   serialize() {
     const feeRateBuffer = Buffer.alloc(FEE_RATE_LENGTH);
-    feeRateBuffer.writeBigUint64LE(this.feeRate);
+    feeRateBuffer.writeBigUInt64LE(this.feeRate);
     return feeRateBuffer;
   }
 
   static deserialize(msg) {
-    if (!Buffer.isBuffer(msg) || msg.length !== FEE_RATE_LENGTH) return null;
+    if (!Buffer.isBuffer(msg)) return null;
     const feeRate = msg.readBigUInt64LE(FEE_RATE_OFFSET);
     return new FeeFilter(FEE_RATE_LENGTH, feeRate);
   }

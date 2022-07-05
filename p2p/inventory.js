@@ -35,11 +35,8 @@ export class Inventory {
   }
 
   static deserialize(msg) {
-    if (!Buffer.isBuffer(msg) || msg.length !== Inventory.INVENTORY_LENGTH) {
-      console.log('inventory deserialize failed', !Buffer.isBuffer(msg), msg.length !== Inventory.INVENTORY_LENGTH)
-      return null;
-    }
-    const typeIdentifier = msg.readUint32LE(TYPE_IDENTIFIER_OFFSET);
+    if (!Buffer.isBuffer(msg)) return null;
+    const typeIdentifier = msg.readUInt32LE(TYPE_IDENTIFIER_OFFSET);
     const hash = msg.subarray(HASH_OFFSET, HASH_OFFSET + HASH_LENGTH).toString('hex');
     return new Inventory(typeIdentifier, hash);
   }

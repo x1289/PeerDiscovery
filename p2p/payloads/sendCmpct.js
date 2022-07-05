@@ -25,6 +25,7 @@ export class SendCmpct {
   }
 
   static deserialize(msg) {
+    if (!Buffer.isBuffer(msg)) return null;
     const announce = msg.readInt8(ANNOUNCE_OFFSET);
     const version = msg.readBigUInt64LE(VERSION_OFFSET);
     return new SendCmpct(ANNOUNCE_LENGTH + VERSION_LENGTH, announce, version);

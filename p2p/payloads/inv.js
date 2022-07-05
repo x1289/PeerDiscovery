@@ -25,16 +25,10 @@ export class Inv {
   }
 
   static deserialize(msg) {
-    if (!Buffer.isBuffer(msg)) {
-      console.log('inventory msg not a buffer', msg);
-      return null;
-    }
+    if (!Buffer.isBuffer(msg)) return null;
     const count = helper.readCompactSizeValue(msg, COUNT_OFFSET);
     const countBytes = helper.getCompactSizeBytes(count);
-    if (msg.length !== (countBytes + count * Inventory.INVENTORY_LENGTH)) {
-      console.log('inventory bad length', msg, count);
-      return null;
-    }
+    if (msg.length < (countBytes + count * Inventory.INVENTORY_LENGTH)) return null;
     const inventories = [];
     for (let i = 0; i < count; i++) {
       const inventoryStart = countBytes + i * Inventory.INVENTORY_LENGTH;

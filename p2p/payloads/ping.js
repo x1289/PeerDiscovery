@@ -11,13 +11,13 @@ export class Ping {
 
   serialize() {
     const nonceBuffer = Buffer.alloc(NONCE_LENGTH);
-    nonceBuffer.writeBigUint64LE(this.nonce);
+    nonceBuffer.writeBigUInt64LE(this.nonce);
     return nonceBuffer;
   }
 
   static deserialize(msg) {
-    if (!Buffer.isBuffer(msg) || msg.length !== NONCE_LENGTH) return null;
-    const nonce = msg.readBigInt64LE(NONCE_OFFSET);
+    if (!Buffer.isBuffer(msg)) return null;
+    const nonce = msg.readBigUInt64LE(NONCE_OFFSET);
     return new Ping(nonce);
   }
 }
