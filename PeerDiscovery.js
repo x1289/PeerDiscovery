@@ -37,24 +37,23 @@ class PeerDiscovery {
     if (!peer || peer.dataBuffer.length < MessageHeader.HEADER_SIZE) return;
 
     while(peer.dataBuffer.length > 0) {
-      const msgHeader = MessageHeader.deserialize(peer.dataBuffer);
-      if (peer.dataBuffer.length < (MessageHeader.HEADER_SIZE + msgHeader.payloadSize)) break;
-      const payloadBuffer = peer.dataBuffer.subarray(MessageHeader.HEADER_SIZE, MessageHeader.HEADER_SIZE + msgHeader.payloadSize);
+      const nextHeaderIndex = peer.dataBuffer.indexOf(Buffer.from(CONSTANTS.START_STRINGS[peer.network]));
+      if (nextHeaderIndex === -1) break;
+      const msg = peer.dataBuffer.subarray(nextHeaderIndex);
+      const msgHeader = MessageHeader.deserialize(msg);
+      if (msg.length < (MessageHeader.HEADER_SIZE + msgHeader.payloadSize)) break;
+      const payloadBuffer = msg.subarray(MessageHeader.HEADER_SIZE, MessageHeader.HEADER_SIZE + msgHeader.payloadSize);
 
       const payloadChecksum = helper.checksum(payloadBuffer);
 
       if (Buffer.compare(payloadChecksum, msgHeader.checksum) !== 0) {
-        peer.dataBuffer = peer.dataBuffer.subarray(MessageHeader.HEADER_SIZE + msgHeader.payloadSize);
+        peer.dataBuffer = msg.subarray(MessageHeader.HEADER_SIZE + msgHeader.payloadSize);
         continue;
       }
 
       const payload = Message.deserializePayload(msgHeader.commandName, payloadBuffer);
       const newMessage = new Message(msgHeader, payload);
-      peer.dataBuffer = peer.dataBuffer.subarray(MessageHeader.HEADER_SIZE + msgHeader.payloadSize);
-
-      // const nextHeaderIndex = msg.indexOf(Buffer.from(CONSTANTS.START_STRINGS[peer.network]));
-      // if (nextHeaderIndex === -1) break;
-      // if (nextHeaderIndex > 0) msg = msg.subarray(nextHeaderIndex);
+      peer.dataBuffer = msg.subarray(MessageHeader.HEADER_SIZE + msgHeader.payloadSize);
 
       this.handleMessage(peer, newMessage);
     }
