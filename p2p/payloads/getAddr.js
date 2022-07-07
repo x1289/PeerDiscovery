@@ -2,7 +2,6 @@ import { Buffer } from 'buffer';
 
 export class GetAddr {
   constructor() {
-    this.serializedSize = 0;
   }
 
   serialize() {

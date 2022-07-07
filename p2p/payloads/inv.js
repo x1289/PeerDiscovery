@@ -5,14 +5,9 @@ import * as helper from '../helper.js';
 const COUNT_OFFSET = 0;
 
 export class Inv {
-  constructor(serializedSize = null, count, inventories) {
+  constructor(count, inventories) {
     this.count = count;
     this.inventories = inventories;
-    if (serializedSize === null) {
-      this.serializedSize = this.serialize().length;
-    } else {
-      this.serializedSize = serializedSize;
-    }
   }
 
   serialize() {
@@ -35,7 +30,6 @@ export class Inv {
       const inv1 = Inventory.deserialize(msg.subarray(inventoryStart, inventoryStart + Inventory.INVENTORY_LENGTH));
       inventories.push(inv1);
     }
-    const serializedSize = countBytes + count * Inventory.INVENTORY_LENGTH;
-    return new Inv(serializedSize, count, inventories);
+    return new Inv(count, inventories);
   }
 }

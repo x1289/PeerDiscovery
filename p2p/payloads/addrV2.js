@@ -5,14 +5,9 @@ import * as helper from '../helper.js';
 const COUNT_OFFSET = 0;
 
 export class AddrV2 {
-  constructor(serializedSize = null, addressCount, addresses) {
+  constructor(addressCount, addresses) {
     this.addressCount = addressCount;
     this.addresses = addresses;
-    if (serializedSize === null) {
-      this.serializedSize = this.serialize().length;
-    } else {
-      this.serializedSize = serializedSize;
-    }
   }
 
   serialize() {
@@ -32,14 +27,11 @@ export class AddrV2 {
     const addressCount = helper.readCompactSizeValue(msg, COUNT_OFFSET);
     const addressCountBytes = helper.getCompactSizeBytes(addressCount);
     const addresses = [];
-    const serializedSize = addressCountBytes;
     const subMsg = msg.subarray(addressCountBytes);
     for (let i = 0; i < addressCount; i++) {
       const addrV2 = AddressV2.deserialize(subMsg);
-      serializedSize += addrV2.serializedSize;
-      subMsg = subMsg.subarray(addrV2.serializedSize);
       addresses.push(addrV2);
     }
-    return new AddrV2(serializedSize, addressCount, addresses);
+    return new AddrV2(addressCount, addresses);
   }
 }

@@ -7,14 +7,9 @@ const VERSION_OFFSET = 1;
 const VERSION_LENGTH = 8;
 
 export class SendCmpct {
-  constructor(serializedSize = null, announce, version) {
+  constructor(announce, version) {
     this.announce = announce;
     this.version = version;
-    if (serializedSize === null) {
-      this.serializedSize = this.serialize().length;
-    } else {
-      this.serializedSize = serializedSize;
-    }
   }
 
   serialize() {
@@ -26,8 +21,8 @@ export class SendCmpct {
 
   static deserialize(msg) {
     if (!Buffer.isBuffer(msg)) return null;
-    const announce = msg.readInt8(ANNOUNCE_OFFSET);
+    const announce = Boolean(msg.readInt8(ANNOUNCE_OFFSET));
     const version = msg.readBigUInt64LE(VERSION_OFFSET);
-    return new SendCmpct(ANNOUNCE_LENGTH + VERSION_LENGTH, announce, version);
+    return new SendCmpct(announce, version);
   }
 }

@@ -12,16 +12,11 @@ const BLOCK_HEADER_HASH_LENGTH = 32;
 const STOP_HASH_LENGTH = 32;
 
 export class GetBlocks {
-  constructor(serializedSize = null, version, hashCount, blockHeaderHashes, stopHash) {
+  constructor(version, hashCount, blockHeaderHashes, stopHash) {
     this.version = version;
     this.hashCount = hashCount;
     this.blockHeaderHashes = blockHeaderHashes;
     this.stopHash = stopHash;
-    if (serializedSize === null) {
-      this.serializedSize = this.serialize().length;
-    } else {
-      this.serializedSize = serializedSize;
-    }
   }
 
   serialize() {
@@ -53,7 +48,6 @@ export class GetBlocks {
     const stopHashOffset = VERSION_LENGTH + hashCountBytes + hashCount * BLOCK_HEADER_HASH_LENGTH;
     const stopHash = msg.subarray(stopHashOffset, stopHashOffset + STOP_HASH_LENGTH).toString('hex');
 
-    const serializedSize = VERSION_LENGTH + hashCountBytes + hashCount * BLOCK_HEADER_HASH_LENGTH + STOP_HASH_LENGTH;
-    return new GetBlocks(serializedSize, version, hashCount, blockHeaderHashes, stopHash);
+    return new GetBlocks(version, hashCount, blockHeaderHashes, stopHash);
   }
 }

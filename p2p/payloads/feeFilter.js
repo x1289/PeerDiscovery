@@ -4,13 +4,8 @@ const FEE_RATE_OFFSET = 0;
 const FEE_RATE_LENGTH = 8;
 
 export class FeeFilter {
-  constructor(serializedSize = null, feeRate) {
+  constructor(feeRate) {
     this.feeRate = feeRate;
-    if (serializedSize === null) {
-      this.serializedSize = this.serialize().length;
-    } else {
-      this.serializedSize = serializedSize;
-    }
   }
 
   serialize() {
@@ -22,6 +17,6 @@ export class FeeFilter {
   static deserialize(msg) {
     if (!Buffer.isBuffer(msg)) return null;
     const feeRate = msg.readBigUInt64LE(FEE_RATE_OFFSET);
-    return new FeeFilter(FEE_RATE_LENGTH, feeRate);
+    return new FeeFilter(feeRate);
   }
 }

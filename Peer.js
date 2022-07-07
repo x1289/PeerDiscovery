@@ -1,19 +1,25 @@
 import net from 'net';
 import EventEmitter from 'events';
 
-const STATE_DISCONNECTED = 'disconnected';
-const STATE_CONNECTING = 'connecting';
-const STATE_CONNECTED = 'connected';
-const STATE_DISCONNECTING = 'disconnecting';
-
 export class Peer extends EventEmitter {
+  static STATE_DISCONNECTED = 'disconnected';
+  static STATE_CONNECTING = 'connecting';
+  static STATE_CONNECTED = 'connected';
+  static STATE_DISCONNECTING = 'disconnecting';
+
   constructor(id, network, port, address) {
     super();
     this.id = id;
     this.network = network;
     this.port = port;
     this.address = address;
-    this.connectionState = STATE_DISCONNECTED;
+    this.connectionState = Peer.STATE_DISCONNECTED;
+    this.dataBuffer = Buffer.alloc(0);
+  }
+
+  appendData(incoming) {
+    if (!Buffer.isBuffer(incoming)) return;
+    this.dataBuffer = Buffer.concat([this.dataBuffer, incoming], this.dataBuffer.length + incoming.length);
   }
 
   connect() {
@@ -24,17 +30,18 @@ export class Peer extends EventEmitter {
     
     this.socket.on('connect', () => {
       this.emit('connect', this.id);
-      this.connectionState = STATE_CONNECTING;
+      this.setConnectionState(Peer.STATE_CONNECTING);
       console.log('socket connect');
     })
     
     this.socket.on('data', (data) => {
-      this.emit('message', {id: this.id, data})
+      this.appendData(data);
+      this.emit('message', this.id)
     })
     
     this.socket.on('end', () => {
       console.log('socket end');
-      this.connectionState = STATE_DISCONNECTED;
+      this.setConnectionState(Peer.STATE_DISCONNECTED);
     })
     
     this.socket.on('error', (error) => {
@@ -53,15 +60,26 @@ export class Peer extends EventEmitter {
   }
 
   isDisconnected() {
-    return this.connectionState === STATE_DISCONNECTED
+    return this.connectionState === Peer.STATE_DISCONNECTED
   }
 
   isConnected() {
-    return this.connectionState === STATE_CONNECTED;
+    return this.connectionState === Peer.STATE_CONNECTED;
   }
 
   isConnecting() {
-    return this.connectionState === STATE_CONNECTING;
+    return this.connectionState === Peer.STATE_CONNECTING;
   }
 
+  setConnectionState(newState) {
+    if (newState === Peer.STATE_DISCONNECTED) {
+      this.connectionState = Peer.STATE_DISCONNECTED;
+    } else if (newState === Peer.STATE_CONNECTING) {
+      this.connectionState = Peer.STATE_CONNECTING;
+    } else if (newState === Peer.STATE_CONNECTED) {
+      this.connectionState = Peer.STATE_CONNECTED;
+    } else if (newState === Peer.STATE_DISCONNECTING) {
+      this.connectionState = Peer.STATE_DISCONNECTING;
+    }
+  }
 }

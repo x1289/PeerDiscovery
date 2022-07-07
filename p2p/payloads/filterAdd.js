@@ -4,14 +4,9 @@ import * as helper from '../helper.js';
 const ELEMENT_BYTES_OFFSET = 0;
 
 export class FilterAdd {
-  constructor(serializedSize = null, elementBytes, element) {
+  constructor(elementBytes, element) {
     this.elementBytes = elementBytes;
     this.element = element;
-    if (serializedSize === null) {
-      this.serializedSize = this.serialize().length;
-    } else {
-      this.serializedSize = serializedSize;
-    }
   }
 
   serialize() {
@@ -28,7 +23,6 @@ export class FilterAdd {
     if (msg.length !== (ELEMENT_BYTES_OFFSET + elementBytesBytes)) return null;
 
     const element = msg.subarray(elementBytesBytes, elementBytesBytes + elementBytes);
-    const serializedSize = elementBytesBytes + elementBytes;
-    return new FilterAdd(serializedSize, elementBytes, element);
+    return new FilterAdd(elementBytes, element);
   }
 }

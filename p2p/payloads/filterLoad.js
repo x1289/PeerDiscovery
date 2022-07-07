@@ -11,18 +11,13 @@ const N_TWEAK_LENGTH = 4;
 const N_FLAGS_LENGTH = 1;
 
 export class FilterLoad {
-  constructor(serializedSize, nFilterBytes, filter, nHashFuncs, nTweak, nFlags) {
+  constructor(nFilterBytes, filter, nHashFuncs, nTweak, nFlags) {
     if (!filter || filter.length > MAX_FILTER_LENGTH || nHashFuncs > MAX_N_HASH_FUNCS) return null;
     this.nFilterBytes = nFilterBytes;
     this.filter = filter;
     this.nHashFuncs = nHashFuncs;
     this.nTweak = nTweak;
     this.nFlags = nFlags;
-    if (serializedSize === null) {
-      this.serializedSize = this.serialize().length;
-    } else {
-      this.serializedSize = serializedSize;
-    }
   }
 
   serialize() {
@@ -48,7 +43,6 @@ export class FilterLoad {
     const nTweak = Buffer.readUInt32LE(nFilterBytesBytes + nFilterBytes + N_HASH_FUNCS_LENGTH);
     const nFlags = Buffer.readUInt8(nFilterBytesBytes + nFilterBytes + N_HASH_FUNCS_LENGTH + N_TWEAK_LENGTH);
     
-    const serializedSize = nFilterBytesBytes + nFilterBytes + N_HASH_FUNCS_LENGTH + N_TWEAK_LENGTH + N_FLAGS_LENGTH;
-    return new FilterLoad(serializedSize, nFilterBytes, filter, nHashFuncs, nTweak, nFlags);
+    return new FilterLoad(nFilterBytes, filter, nHashFuncs, nTweak, nFlags);
   }
 }

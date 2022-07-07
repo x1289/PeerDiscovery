@@ -31,32 +31,41 @@ class PeerDiscovery {
     this.startListeningToPeer(peer);
   }
 
-  handleMessageFromPeer(peer, msg) {
-    if (!Buffer.isBuffer(msg) || msg.length < MessageHeader.HEADER_SIZE) return null;
-    while(msg.length > 0) {
-      const msgHeader = MessageHeader.deserialize(msg);
-      if (!msgHeader) break; // break on bad header.. maybe this could be recovered by searching for next startstring but TODO someday...
-      const payloadBuffer = Buffer.alloc(msgHeader.payloadSize);
-      if (msgHeader.payloadSize > 0) {
-        msg.copy(payloadBuffer, 0, MessageHeader.HEADER_SIZE, MessageHeader.HEADER_SIZE + msgHeader.payloadSize);
-      }
+  handleMessageFromPeer(id) {
+    if (!id) return;
+    const peer = this.peers[id];
+    if (!peer || peer.dataBuffer.length < MessageHeader.HEADER_SIZE) return;
+
+    while(peer.dataBuffer.length > 0) {
+      const msgHeader = MessageHeader.deserialize(peer.dataBuffer);
+      if (peer.dataBuffer.length < (MessageHeader.HEADER_SIZE + msgHeader.payloadSize)) break;
+      
+      const payloadBuffer = peer.dataBuffer.subarray(MessageHeader.HEADER_SIZE, MessageHeader.HEADER_SIZE + msgHeader.payloadSize);
       const payload = Message.deserializePayload(msgHeader.commandName, payloadBuffer);
-      msg = msg.subarray(MessageHeader.HEADER_SIZE + msgHeader.payloadSize);
-      this.handleMessage(peer, new Message(msgHeader, payload));
+
+      const newMessage = new Message(msgHeader, payload);
+      peer.dataBuffer = peer.dataBuffer.subarray(MessageHeader.HEADER_SIZE + msgHeader.payloadSize);
+
+      // const nextHeaderIndex = msg.indexOf(Buffer.from(CONSTANTS.START_STRINGS[peer.network]));
+      // if (nextHeaderIndex === -1) break;
+      // if (nextHeaderIndex > 0) msg = msg.subarray(nextHeaderIndex);
+
+      this.handleMessage(peer, newMessage);
     }
   }
 
   startListeningToPeer(peer) {
     peer.on('connect', (id) => {
       if (id === peer.id) {
-        const connectMessage = this.getVersionMessage();
-        peer.send(connectMessage.serialize());
+        const versionMessage = this.getVersionMessage();
+        const versionMessageSerialized = versionMessage.serialize()
+        peer.send(versionMessageSerialized);
       }
     })
-    peer.on('message', ({id, data}) => {
+    peer.on('message', (id) => {
       try {
         if (id !== peer.id) return;
-        this.handleMessageFromPeer(peer, data);
+        this.handleMessageFromPeer(id);
       } catch (error) {
         console.log('error', error);
       }
@@ -83,7 +92,7 @@ class PeerDiscovery {
   }
 
   getVersionMessage() {
-    const connectMessagePayload = new payloads.Version(null, this.version, 1037n, BigInt(Math.floor(+new Date() / 1000)), 0n,
+    const connectMessagePayload = new payloads.Version(this.version, 1037n, BigInt(Math.floor(+new Date() / 1000)), 0n,
     Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x5f, 0xde, 0x31, 0xd4]), 8333,
     1037n, Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]), 0, 123n, 16, '/Satoshi:0.16.2/', 0, true);
     const connectMessagePayloadSerialized = connectMessagePayload.serialize();
