@@ -97,6 +97,7 @@ class PeerDiscovery {
   }
 
   getVersionMessage() {
+    // currently hardcoded sample version message
     const connectMessagePayload = new payloads.Version(this.version, 1037n, BigInt(Math.floor(+new Date() / 1000)), 0n,
     Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x5f, 0xde, 0x31, 0xd4]), 8333,
     1037n, Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]), 0, 123n, 16, '/Satoshi:0.16.2/', 0, true);
@@ -111,8 +112,3 @@ class PeerDiscovery {
     return new Message(verAckHeader, verAckPayload);
   }
 }
-
-let pd = new PeerDiscovery(CONSTANTS.MAINNET_START_STRING);
-const peerId = pd.createPeer(CONSTANTS.MAINNET_START_STRING, 8333, '51.68.36.57');
-
-pd.connectToPeer(peerId)

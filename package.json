@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "description": "Networking component for peer discovery for a bitcoin node",
-  "main": "index.js",
+  "main": "PeerDiscovery.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
