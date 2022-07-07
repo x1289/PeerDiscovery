@@ -39,10 +39,16 @@ class PeerDiscovery {
     while(peer.dataBuffer.length > 0) {
       const msgHeader = MessageHeader.deserialize(peer.dataBuffer);
       if (peer.dataBuffer.length < (MessageHeader.HEADER_SIZE + msgHeader.payloadSize)) break;
-      
       const payloadBuffer = peer.dataBuffer.subarray(MessageHeader.HEADER_SIZE, MessageHeader.HEADER_SIZE + msgHeader.payloadSize);
-      const payload = Message.deserializePayload(msgHeader.commandName, payloadBuffer);
 
+      const payloadChecksum = helper.checksum(payloadBuffer);
+
+      if (Buffer.compare(payloadChecksum, msgHeader.checksum) !== 0) {
+        peer.dataBuffer = peer.dataBuffer.subarray(MessageHeader.HEADER_SIZE + msgHeader.payloadSize);
+        continue;
+      }
+
+      const payload = Message.deserializePayload(msgHeader.commandName, payloadBuffer);
       const newMessage = new Message(msgHeader, payload);
       peer.dataBuffer = peer.dataBuffer.subarray(MessageHeader.HEADER_SIZE + msgHeader.payloadSize);
 
