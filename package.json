@@ -1,11 +1,10 @@
 {
   "name": "peerdiscovery",
   "version": "1.0.0",
-  "type": "module",
   "description": "Networking component for peer discovery for a bitcoin node",
-  "main": "PeerDiscovery.js",
+  "main": "src/PeerDiscovery.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "nyc --reporter=text mocha --require ts-node/register --extensions ts,tsx --watch --watch-files src 'src/test/**/*.spec.{ts,tsx}'"
   },
   "repository": {
     "type": "git",
@@ -17,5 +16,19 @@
   "bugs": {
     "url": "https://github.com/x1289/PeerDiscovery/issues"
   },
-  "homepage": "https://github.com/x1289/PeerDiscovery#readme"
+  "homepage": "https://github.com/x1289/PeerDiscovery#readme",
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.3",
+    "@types/chai": "^4.3.1",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^18.0.6",
+    "chai": "^4.3.6",
+    "mocha": "^10.0.0",
+    "nyc": "^15.1.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4"
+  },
+  "imports": {
+    "#src/*": "./src/*.ts"
+  }
 }

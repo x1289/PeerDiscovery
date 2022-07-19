@@ -1,10 +1,10 @@
 import net from 'net';
 import { randomUUID } from 'crypto';
-import { Message } from './p2p/message.js';
-import { MessageHeader } from './p2p/messageHeader.js';
-import * as CONSTANTS from './p2p/constants.js';
-import * as payloads from './p2p/payloads/payloads.js';
-import * as helper from './p2p/helper.js';
+import { Message } from './p2p/message.js.js';
+import { MessageHeader } from './p2p/messageHeader.js.js';
+import * as CONSTANTS from './p2p/constants.js.js';
+import * as payloads from './p2p/payloads/payloads.js.js';
+import * as helper from './p2p/helper.js.js';
 import { Peer } from './Peer.js';
 
 class PeerDiscovery {

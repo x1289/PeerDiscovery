@@ -2,12 +2,20 @@ import net from 'net';
 import EventEmitter from 'events';
 
 export class Peer extends EventEmitter {
+  id: string;
+  network: string;
+  port: number;
+  address: string;
+  connectionState: string;
+  dataBuffer: Buffer;
+  socket?: net.Socket;
+
   static STATE_DISCONNECTED = 'disconnected';
   static STATE_CONNECTING = 'connecting';
   static STATE_CONNECTED = 'connected';
   static STATE_DISCONNECTING = 'disconnecting';
 
-  constructor(id, network, port, address) {
+  constructor(id: string, network: string, port: number, address: string) {
     super();
     this.id = id;
     this.network = network;
@@ -17,7 +25,7 @@ export class Peer extends EventEmitter {
     this.dataBuffer = Buffer.alloc(0);
   }
 
-  appendData(incoming) {
+  appendData(incoming: Buffer) {
     if (!Buffer.isBuffer(incoming)) return;
     this.dataBuffer = Buffer.concat([this.dataBuffer, incoming], this.dataBuffer.length + incoming.length);
   }
@@ -53,14 +61,14 @@ export class Peer extends EventEmitter {
     })
   }
 
-  send(msg) {
+  send(msg: Buffer) {
     if (this.socket !== undefined) {
       this.socket.write(msg);
     }
   }
 
   isDisconnected() {
-    return this.connectionState === Peer.STATE_DISCONNECTED
+    return this.connectionState === Peer.STATE_DISCONNECTED;
   }
 
   isConnected() {
@@ -71,7 +79,7 @@ export class Peer extends EventEmitter {
     return this.connectionState === Peer.STATE_CONNECTING;
   }
 
-  setConnectionState(newState) {
+  setConnectionState(newState: string) {
     if (newState === Peer.STATE_DISCONNECTED) {
       this.connectionState = Peer.STATE_DISCONNECTED;
     } else if (newState === Peer.STATE_CONNECTING) {
