@@ -82,4 +82,80 @@ export class Peer extends EventEmitter {
       this.connectionState = Peer.STATE_DISCONNECTING;
     }
   }
+
+  // #region Data Messages
+  getHeaders() {
+    return;
+  }
+
+  getBlocks() {
+    return;
+  }
+
+  memPool() {
+    return;
+  }
+  // #endregion Data Messages
+  // #region Control Messages
+  addr() {
+    return;
+  }
+
+  addrV2() {
+    return;
+  }
+
+  alert() {
+    return;
+  }
+
+  feeFilter() {
+    return;
+  }
+
+  filterAdd() {
+    return;
+  }
+
+  filterClear() {
+    return;
+  }
+
+  filterLoad() {
+    return;
+  }
+
+  getAddr() {
+    return;
+  }
+
+  ping() {
+    return;
+  }
+
+  pong() {
+    return;
+  }
+
+  reject() {
+    return;
+  }
+
+  sendHeaders() {
+    return;
+  }
+
+  sendAddrV2() {
+    return;
+  }
+
+  verAck() {
+    return;
+  }
+
+  version() {
+    return;
+  }
+  // #endregion Control Messages
+  
 }
